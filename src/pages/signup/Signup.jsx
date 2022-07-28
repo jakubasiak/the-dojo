@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useSignup } from "../../hooks/useSignup"
 import './Signup.css'
 
 export default function Signup() {
@@ -6,9 +7,37 @@ export default function Signup() {
   const [password, setPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
   const [thumbnail, setThumbnail] = useState(null)
+  const [thumbnailError, setThumbnailError] = useState(null)
+  const { signup, error, isPending } = useSignup()
+
+  const handleFileChange = (e) => {
+    setThumbnail(null)
+    let selected = e.target.files[0]
+    if(!selected) {
+      setThumbnailError('Please select the file')
+      return
+    }
+    if(!selected.type.includes('image')) {
+      setThumbnailError('Selected file must be an image')
+      return
+    }
+    if(selected.size > 1000000) {
+      setThumbnailError('Image file size must be less than 1 Mb')
+      return
+    }
+
+    setThumbnailError(null)
+    setThumbnail(selected)
+    console.log('thumbnali updated')
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    signup(email, password, displayName, thumbnail)
+  }
 
   return (
-    <form className="auth-form">
+    <form className="auth-form" onSubmit={handleSubmit}>
       <h2>Sign up</h2>
       <label>
         <span>email:</span>
@@ -38,9 +67,13 @@ export default function Signup() {
         <span>profile thumbnail:</span>
         <input type="file"
           required
+          onChange={handleFileChange}
         />
+        {thumbnailError && <div className="error">{thumbnailError}</div>}
       </label>
-      <button className="btn">Sign up</button>
+      {!isPending && <button className="btn">Sign up</button>}
+      {isPending && <button className="btn" disabled>Signing up...</button>}
+      {error && <div className="error">{error}</div>}
     </form>
   )
 }
