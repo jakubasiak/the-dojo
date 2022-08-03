@@ -20,7 +20,7 @@ export default function Create() {
   const [dueDate, setDueDate] = useState('')
   const [category, setCategory] = useState('')
   const [assignedUsers, setAssignedUsers] = useState([])
-  const { documents, error } = useCollection('users')
+  const { documents } = useCollection('users')
   const [users, setUsers] = useState([])
   const [formError, setFormError] = useState(null)
   const { user } = useAuthContext()
